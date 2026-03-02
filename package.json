@@ -1,0 +1,27 @@
+{
+  "name": "entrega_1",
+  "version": "1.0.0",
+  "description": "Entrega 1 Comision 76800 EL",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "dev": "nodemon backend/src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EmilianoLafuente/ENTREGA_1.git"
+  },
+  "author": "Emiliano Lafuente",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EmilianoLafuente/ENTREGA_1/issues"
+  },
+  "homepage": "https://github.com/EmilianoLafuente/ENTREGA_1#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
