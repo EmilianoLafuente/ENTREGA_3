@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import ProductManager from '../managers/ProductManager.js'
+import { io } from '../server.js'
 
 const router = Router()
 const productManager = new ProductManager('backend/data/products.json')
@@ -28,6 +29,10 @@ router.post('/', async (req, res) => {
 
   const newProduct = await productManager.addProduct(productData)
 
+  //socket.io
+  const products = await productManager.getProducts()
+  io.emit('updateProducts', products)
+
   res.status(201).json(newProduct)
 })
 
@@ -54,6 +59,10 @@ router.delete('/:pid', async (req, res) => {
   if (!deleted) {
     return res.status(404).json({ error: 'Producto no encontrado' })
   }
+
+  //socket.io
+  const products = await productManager.getProducts()
+  io.emit('updateProducts', products)
 
   res.json({ message: 'Producto eliminado correctamente' })
 })
