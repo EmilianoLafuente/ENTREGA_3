@@ -23,6 +23,22 @@ io.on('connection', async (socket) => {
   const products = await productManager.getProducts()
   socket.emit('updateProducts', products)
 
+  //Add con scoket.io
+  socket.on('newProduct', async (productData) => {
+    await productManager.addProduct(productData)
+
+    const products = await productManager.getProducts()
+    io.emit('updateProducts', products)
+  })
+
+  //Delete con scoket.io
+  socket.on('deleteProduct', async (id) => {
+  await productManager.deleteProduct(id)
+
+  const products = await productManager.getProducts()
+  io.emit('updateProducts', products)
+})
+
   socket.on('disconnect', () => {
     console.log('🔴 Cliente desconectado')
   })

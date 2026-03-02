@@ -1,14 +1,22 @@
-# Backend 1 76800 – Entrega N°1  
-**API de Productos y Carritos**  
+# Backend 1 76800 – Entrega N°2  
+**API de Productos y Carritos + Handlebars + WebSockets**  
 
 ---
 
 ## 📌 Descripción del proyecto
 
-Este proyecto corresponde a la **Entrega N°1** del curso **Backend 1** de Coderhouse.  
-Consiste en el desarrollo de una **API REST** utilizando **Node.js y Express**, que permite gestionar productos y carritos de compra, con persistencia de datos mediante archivos JSON.
+Este proyecto corresponde a la **Entrega N°2** del curso Backend 1 de Coderhouse.
 
-No se incluye implementación visual, ya que toda la interacción se realiza mediante endpoints HTTP (Postman, navegador o cliente similar).
+Se parte de la API REST desarrollada en la Entrega N°1 y se amplía incorporando:
+
+Motor de plantillas Handlebars
+Comunicación en tiempo real con WebSockets (Socket.io)
+Vista dinámica de productos en tiempo real
+
+La aplicación permite:
+Gestionar productos y carritos mediante API REST.
+Visualizar productos renderizados con Handlebars.
+Agregar y eliminar productos en tiempo real sin recargar la página.
 
 ---
 
@@ -16,6 +24,8 @@ No se incluye implementación visual, ya que toda la interacción se realiza med
 
 - Node.js
 - Express
+- Express-Handlebars
+- Socket.io
 - JavaScript (ES Modules)
 - File System (`fs`)
 - Nodemon (entorno de desarrollo)
@@ -24,20 +34,29 @@ No se incluye implementación visual, ya que toda la interacción se realiza med
 
 ## 📂 Estructura del proyecto
 
-ENTREGA_1/
+ENTREGA_2/
 ├─ backend/
-│ ├─ src/
-│ │ ├─ app.js
-│ │ ├─ server.js
-│ │ ├─ routes/
-│ │ │ ├─ products.router.js
-│ │ │ └─ carts.router.js
-│ │ └─ managers/
-│ │ ├─ ProductManager.js
-│ │ └─ CartManager.js
-│ └─ data/
-│ ├─ products.json
-│ └─ carts.json
+│  ├─ src/
+│  │  ├─ app.js
+│  │  ├─ server.js
+│  │  ├─ routes/
+│  │  │  ├─ products.router.js
+│  │  │  ├─ carts.router.js
+│  │  │  └─ views.router.js
+│  │  ├─ managers/
+│  │  │  ├─ ProductManager.js
+│  │  │  └─ CartManager.js
+│  │  ├─ views/
+│  │  │  ├─ home.handlebars
+│  │  │  ├─ realTimeProducts.handlebars
+│  │  │  └─ layouts/
+│  │  │     └─ main.handlebars
+│  │  └─ public/
+│  │     └─ js/
+│  │        └─ realtime.js
+│  └─ data/
+│     ├─ products.json
+│     └─ carts.json
 ├─ package.json
 ├─ package-lock.json
 └─ README.md
@@ -146,6 +165,48 @@ La lógica de acceso y manipulación de datos se encuentra desacoplada en las cl
 
 ProductManager
 CartManager
+
+
+🖥️ Vistas con Handlebars
+🔹 Home
+GET /
+
+Renderiza la lista de productos utilizando Handlebars.
+
+🔹 Productos en Tiempo Real
+GET /realtimeproducts
+
+Vista que:
+
+Muestra productos renderizados con Handlebars.
+
+Permite agregar productos mediante WebSocket.
+
+Permite eliminar productos mediante WebSocket.
+
+Se actualiza automáticamente en tiempo real sin recargar la página.
+
+⚡ WebSockets
+
+Se implementa Socket.io para:
+
+Enviar lista de productos al conectar un cliente.
+
+Emitir evento updateProducts cuando:
+
+Se crea un producto.
+
+Se elimina un producto.
+
+Permitir creación y eliminación desde el frontend vía eventos:
+
+newProduct
+
+deleteProduct
+
+Esto permite una experiencia en tiempo real sincronizada entre múltiples clientes conectados.
+
+
 
 👤 Autor
 Emiliano Lafuente

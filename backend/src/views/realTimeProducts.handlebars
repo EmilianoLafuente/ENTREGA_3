@@ -1,5 +1,15 @@
 <h1>Productos en Tiempo Real</h1>
 
+<h2>Agregar Producto</h2>
+
+<form id="productForm">
+  <input type="text" name="title" placeholder="Título" required />
+  <input type="number" name="price" placeholder="Precio" required />
+  <button type="submit">Agregar</button>
+</form>
+
+<hr>
+
 <ul id="productsList">
   {{#each products}}
     <li>
