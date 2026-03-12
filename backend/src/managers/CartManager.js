@@ -1,81 +1,57 @@
-import fs from 'fs'
+import { CartModel } from "../models/cart.model.js";
 
 class CartManager {
-  constructor(path) {
-    this.path = path
+
+  async createCart() {
+
+    const newCart = await CartModel.create({
+      products: []
+    });
+
+    return newCart;
+
   }
 
+  async getCartById(id) {
 
-    async createCart() {
-        let carts = []
+    const cart = await CartModel
+      .findById(id)
+      .populate("products.product")
+      .lean();
 
-        try {
-        const data = await fs.promises.readFile(this.path, 'utf-8')
-        carts = JSON.parse(data)
-        } catch (error) {
-        carts = []
-        }
+    return cart;
 
-        const newCart = {
-        id: Date.now().toString(),
-        products: []
-        }
+  }
 
-        carts.push(newCart)
+  async addProductToCart(cartId, productId) {
 
-        await fs.promises.writeFile(
-        this.path,
-        JSON.stringify(carts, null, 2)
-        )
+    const cart = await CartModel.findById(cartId);
 
-        return newCart
+    if (!cart) return null;
+
+    const productIndex = cart.products.findIndex(
+      p => p.product.toString() === productId
+    );
+
+    if (productIndex !== -1) {
+
+      cart.products[productIndex].quantity += 1;
+
+    } else {
+
+      cart.products.push({
+        product: productId,
+        quantity: 1
+      });
+
     }
 
-    async getCartById(id) {
-        try {
-        const data = await fs.promises.readFile(this.path, 'utf-8')
-        const carts = JSON.parse(data)
+    await cart.save();
 
-        return carts.find(c => c.id === id) || null
-        } catch (error) {
-        return null
-        }
-    }
+    return cart;
 
-    async addProductToCart(cartId, productId) {
-        const data = await fs.promises.readFile(this.path, 'utf-8')
-        const carts = JSON.parse(data)
-
-        const cartIndex = carts.findIndex(c => c.id === cartId)
-        if (cartIndex === -1) return null
-
-        const cart = carts[cartIndex]
-
-        const productIndex = cart.products.findIndex(
-        p => p.product === productId
-        )
-
-        if (productIndex !== -1) {
-        // El producto ya existe, incrementa quantity
-        cart.products[productIndex].quantity += 1
-        } else {
-        // El producto no existe, se agrega
-        cart.products.push({
-            product: productId,
-            quantity: 1
-        })
-        }
-
-        carts[cartIndex] = cart
-
-        await fs.promises.writeFile(
-        this.path,
-        JSON.stringify(carts, null, 2)
-        )
-
-        return cart
-    }
+  }
 
 }
 
-export default CartManager
+export default CartManager;

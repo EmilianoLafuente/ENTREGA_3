@@ -7,6 +7,11 @@ import productsRouter from './routes/products.router.js'
 import cartsRouter from './routes/carts.router.js'
 import viewsRouter from './routes/views.router.js'
 
+import { connectMongo } from "./config/mongo.js";
+
+
+connectMongo();
+
 const app = express()
 
 // Necesario para __dirname en ES modules

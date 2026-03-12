@@ -1,16 +1,73 @@
 import { Router } from 'express'
 import ProductManager from '../managers/ProductManager.js'
+import { ProductModel } from '../models/product.model.js'
 import { io } from '../server.js'
 
 const router = Router()
-const productManager = new ProductManager('backend/data/products.json')
+const productManager = new ProductManager()
 
     //GET
-router.get('/', async  (req, res) => {
-  const products = await productManager.getProducts()
+router.get("/", async (req, res) => {
 
-  res.json(products)
-})
+  try {
+
+    let { limit = 10, page = 1, sort, query } = req.query;
+
+    let filter = {};
+
+    if (query) {
+
+      if (query === "available") {
+        filter.stock = { $gt: 0 };
+      } else {
+        filter.category = query;
+      }
+
+    }
+
+    let options = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      lean: true
+    };
+
+    if (sort) {
+      options.sort = { price: sort === "asc" ? 1 : -1 };
+    }
+
+    const result = await ProductModel.paginate(filter, options);
+
+    res.json({
+
+      status: "success",
+      payload: result.docs,
+      totalPages: result.totalPages,
+      prevPage: result.prevPage,
+      nextPage: result.nextPage,
+      page: result.page,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+
+      prevLink: result.hasPrevPage
+        ? `?page=${result.prevPage}`
+        : null,
+
+      nextLink: result.hasNextPage
+        ? `?page=${result.nextPage}`
+        : null
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      status: "error",
+      error: error.message
+    });
+
+  }
+
+});
 
 router.get('/:pid', async (req, res) => {
   const { pid } = req.params

@@ -1,90 +1,48 @@
 //Logica y persistencia
-
-import fs from 'fs'
+import { ProductModel } from "../models/product.model.js"
 
     class ProductManager {
-        constructor(path) {
-            this.path = path
-    }
     
-
+    //Devuelvo todos los prodcuts desde mongoDB
     async getProducts() {
-        try {
-            const data = await fs.promises.readFile(this.path, 'utf-8')
-            return JSON.parse(data)
-        } catch (error) {
-            // Si el archivo no existe o está vacío
-            return []
-        }
-    }  
+        return ProductModel.find().lean()
+    } 
 
+    //Devuelvo el producto desde mongoDB
     async getProductById(id) {
-            const products = await this.getProducts()
-            return products.find(p => p.id === id)
-        }
-
-    async addProduct(productData) {
-        const products = await this.getProducts()
-
-        const newProduct = {
-        id: Date.now().toString(),
-        ...productData
-        }
-
-        products.push(newProduct)
-
-        await fs.promises.writeFile(
-        this.path,
-        JSON.stringify(products, null, 2)
-        )
-
-        return newProduct
+    return ProductModel.findById(id).lean()
     }
 
+    //Crear el producto en mongoDB
+    async addProduct(productData) {
+    const newProduct = await ProductModel.create(productData)
+    return newProduct
+    }
+
+    //Actualizar un producto en mongoDB
     async updateProduct(id, updateData) {
-        const products = await this.getProducts()
 
-        const productExists = products.find(p => p.id === id)
-        if (!productExists) return null
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+    )
 
-        const updatedProducts = products.map(p => {
-        if (p.id === id) {
-            return {
-            ...p,
-            ...updateData,
-            id: p.id // asegura que el id no se modifique
-            }
-        }
-        return p
-        })
+    return updatedProduct
 
-        await fs.promises.writeFile(
-        this.path,
-        JSON.stringify(updatedProducts, null, 2)
-        )
-
-        return updatedProducts.find(p => p.id === id)
     }
 
     async deleteProduct(id) {
-        const products = await this.getProducts()
 
-        const productExists = products.find(p => p.id === id)
-        if (!productExists) return false
+    const deletedProduct = await ProductModel.findByIdAndDelete(id)
 
-        const filteredProducts = products.filter(p => p.id !== id)
+    if (!deletedProduct) return false
 
-        await fs.promises.writeFile(
-        this.path,
-        JSON.stringify(filteredProducts, null, 2)
-        )
+    return true
 
-        return true
     }
 
 }
-
-
 
 
 export default ProductManager
