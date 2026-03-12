@@ -2,6 +2,9 @@ import app from './app.js'
 import http from 'http'
 import { Server } from 'socket.io'
 import ProductManager from './managers/ProductManager.js'
+import dotenv from "dotenv"
+
+dotenv.config()
 
 const PORT = process.env.PORT || 8080
 

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export const connectMongo = async () => {
   try {
 
-    await mongoose.connect("mongodb+srv://emilianolafuente1094_db_user:w5hAzSj00yqCUQeO@clusterbackedcoder.fr2bkqr.mongodb.net/?appName=ClusterBackedCoder");
+    await mongoose.connect(process.env.MONGO_URI);
 
     console.log("MongoDB conectado");
 
