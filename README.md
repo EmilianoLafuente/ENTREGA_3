@@ -168,7 +168,7 @@ PUT /api/products/:pid
 🔹 DELETE /:pid
 Elimina un producto.
 
-DELETE /api/products/:pid
+🔹 DELETE /api/products/:pid
 🛒 Carritos (/api/carts)
 
 🔹 POST /
