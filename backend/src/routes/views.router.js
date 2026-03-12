@@ -52,5 +52,10 @@ router.get("/carts/:cid", async (req, res) => {
 
 })
 
+// Real Time
+router.get('/realtimeproducts', async (req, res) => {
+  const products = await ProductModel.find().lean()
+  res.render('realTimeProducts', { products })
+})
 
 export default router

@@ -1,44 +1,63 @@
-# Backend 1 76800 – Entrega N°2  
-**API de Productos y Carritos + Handlebars + WebSockets**  
+# Backend 1 76800 – Entrega N°3  
+**API de Productos y Carritos + MongoDB + Mongoose + Paginación + Handlebars**  
 
 ---
 
 ## 📌 Descripción del proyecto
 
-Este proyecto corresponde a la **Entrega N°2** del curso Backend 1 de Coderhouse.
+Este proyecto corresponde a la Entrega Final **Entrega N°3** del curso Backend 1 de Coderhouse.
 
-Se parte de la API REST desarrollada en la Entrega N°1 y se amplía incorporando:
+A partir de la aplicación desarrollada en la Entrega N°2, se realiza una migración de la persistencia de datos desde archivos JSON hacia MongoDB, utilizando Mongoose como ODM.
 
-Motor de plantillas Handlebars
-Comunicación en tiempo real con WebSockets (Socket.io)
-Vista dinámica de productos en tiempo real
+Además se implementan funcionalidades avanzadas como:
+
+Paginación de productos
+
+Filtros y ordenamientos
+
+Relación entre carritos y productos mediante populate
+
+Vistas dinámicas con Handlebars
 
 La aplicación permite:
-Gestionar productos y carritos mediante API REST.
-Visualizar productos renderizados con Handlebars.
-Agregar y eliminar productos en tiempo real sin recargar la página.
+
+Gestionar productos y carritos mediante API REST
+
+Persistir los datos en MongoDB Atlas
+
+Consultar productos con paginación, filtros y ordenamiento
+
+Visualizar productos y carritos mediante Handlebars
 
 ---
 
 ## 🛠️ Tecnologías utilizadas
 
-- Node.js
-- Express
-- Express-Handlebars
-- Socket.io
-- JavaScript (ES Modules)
-- File System (`fs`)
-- Nodemon (entorno de desarrollo)
+Node.js
+Express
+MongoDB Atlas
+Mongoose
+mongoose-paginate-v2
+Express-Handlebars
+Socket.io
+JavaScript (ES Modules)
+Nodemon
+Dotenv
 
 ---
 
 ## 📂 Estructura del proyecto
 
-ENTREGA_2/
+ENTREGA_3/
 ├─ backend/
 │  ├─ src/
 │  │  ├─ app.js
 │  │  ├─ server.js
+│  │  ├─ config/
+│  │  │  └─ mongo.js
+│  │  ├─ models/
+│  │  │  ├─ product.model.js
+│  │  │  └─ cart.model.js
 │  │  ├─ routes/
 │  │  │  ├─ products.router.js
 │  │  │  ├─ carts.router.js
@@ -48,17 +67,17 @@ ENTREGA_2/
 │  │  │  └─ CartManager.js
 │  │  ├─ views/
 │  │  │  ├─ home.handlebars
-│  │  │  ├─ realTimeProducts.handlebars
+│  │  │  ├─ product.handlebars
+│  │  │  ├─ cart.handlebars
 │  │  │  └─ layouts/
 │  │  │     └─ main.handlebars
 │  │  └─ public/
 │  │     └─ js/
 │  │        └─ realtime.js
 │  └─ data/
-│     ├─ products.json
-│     └─ carts.json
 ├─ package.json
 ├─ package-lock.json
+├─ .env
 └─ README.md
 
 ---
@@ -66,7 +85,7 @@ ENTREGA_2/
 ## ▶️ Cómo ejecutar el proyecto
 
 ### 1️⃣ Clonar el repositorio
-```bash
+
 git clone <URL_DEL_REPOSITORIO>
 
 2️⃣ Instalar dependencias
@@ -75,39 +94,58 @@ Desde la raíz del proyecto:
 
 npm install
 
-3️⃣ Ejecutar el servidor
+3️⃣ Configurar variables de entorno
+
+Crear archivo .env en la raíz del proyecto:
+
+MONGO_URI=TU_URI_DE_MONGODB_ATLAS
+PORT=8080
+
+4️⃣ Ejecutar el servidor
 
 Modo desarrollo:
-
 npm run dev
 
-
 El servidor se levanta en:
-
-http://localhost:8080 o PORT definido en .env
+http://localhost:8080
 
 ---
 
 📦 Endpoints disponibles
 📍 Productos (/api/products)
 🔹 GET /
+Obtiene productos con paginación, filtros y ordenamiento.
 
-Obtiene todos los productos.
+Ejemplo:
 
 GET /api/products
+GET /api/products?limit=5
+GET /api/products?page=2
+GET /api/products?sort=asc
+GET /api/products?query=category
+GET /api/products?query=available
 
+Respuesta:
+
+{
+  "status": "success",
+  "payload": [],
+  "totalPages": 1,
+  "prevPage": null,
+  "nextPage": null,
+  "page": 1,
+  "hasPrevPage": false,
+  "hasNextPage": false,
+  "prevLink": null,
+  "nextLink": null
+}
 🔹 GET /:pid
-
-Obtiene un producto por su ID.
-
+Obtiene un producto por ID.
 GET /api/products/:pid
 
 🔹 POST /
-
-Crea un nuevo producto (el ID se genera automáticamente).
-
+Crea un nuevo producto.
 POST /api/products
-
 
 Body ejemplo:
 
@@ -121,92 +159,115 @@ Body ejemplo:
   "category": "test",
   "thumbnails": []
 }
-
 🔹 PUT /:pid
-
-Actualiza un producto por ID (no modifica el ID).
-
+Actualiza un producto.
 PUT /api/products/:pid
 
 🔹 DELETE /:pid
-
-Elimina un producto por ID.
+Elimina un producto.
 
 DELETE /api/products/:pid
-
 🛒 Carritos (/api/carts)
+
 🔹 POST /
-
-Crea un nuevo carrito vacío.
-
+Crea un carrito vacío.
 POST /api/carts
 
 🔹 GET /:cid
-
-Obtiene los productos del carrito indicado.
-
+Obtiene un carrito con populate de productos.
 GET /api/carts/:cid
 
-🔹 POST /:cid/product/:pid
+🔹 PUT /:cid
+Actualiza todos los productos del carrito.
+PUT /api/carts/:cid
 
-Agrega un producto al carrito.
-Si el producto ya existe, incrementa la cantidad.
+🔹 PUT /:cid/products/:pid
+Actualiza la cantidad de un producto específico en el carrito.
+PUT /api/carts/:cid/products/:pid
 
-POST /api/carts/:cid/product/:pid
+Body ejemplo:
 
-💾 Persistencia de datos
+{
+  "quantity": 5
+}
 
-La información se almacena en archivos JSON:
+🔹 DELETE /:cid/products/:pid
+Elimina un producto del carrito.
+DELETE /api/carts/:cid/products/:pid
 
-backend/data/products.json
-backend/data/carts.json
+🔹 DELETE /:cid
+Vacía completamente el carrito.
+DELETE /api/carts/:cid
 
-La lógica de acceso y manipulación de datos se encuentra desacoplada en las clases:
+-------------------------------------
 
-ProductManager
-CartManager
+🗄️ Persistencia de datos
+
+La persistencia ahora se realiza en MongoDB Atlas utilizando Mongoose.
+
+Se utilizan los siguientes modelos:
+ProductModel
+
+Colección:
+products
+
+Campos principales:
+
+title
+description
+price
+stock
+category
+code
+status
+
+Además incluye paginación con mongoose-paginate-v2.
+CartModel
+
+Colección:
+carts
+
+Estructura:
+
+products: [
+  {
+    product: {
+      type: ObjectId,
+      ref: "products"
+    },
+    quantity: Number
+  }
+]
+
+Esto permite usar:
+populate("products.product")
+
+para obtener los productos completos del carrito.
 
 
 🖥️ Vistas con Handlebars
-🔹 Home
-GET /
+🔹 Lista de productos
+GET /products
 
-Renderiza la lista de productos utilizando Handlebars.
+Renderiza productos con paginación.
 
-🔹 Productos en Tiempo Real
-GET /realtimeproducts
+🔹 Detalle de producto
+GET /products/:pid
 
-Vista que:
+Muestra información completa del producto.
 
-Muestra productos renderizados con Handlebars.
+🔹 Visualización de carrito
+GET /carts/:cid
 
-Permite agregar productos mediante WebSocket.
-
-Permite eliminar productos mediante WebSocket.
-
-Se actualiza automáticamente en tiempo real sin recargar la página.
+Lista los productos pertenecientes al carrito.
 
 ⚡ WebSockets
 
-Se implementa Socket.io para:
+Se mantiene soporte de Socket.io para conexiones en tiempo real.
 
-Enviar lista de productos al conectar un cliente.
-
-Emitir evento updateProducts cuando:
-
-Se crea un producto.
-
-Se elimina un producto.
-
-Permitir creación y eliminación desde el frontend vía eventos:
-
-newProduct
-
-deleteProduct
-
-Esto permite una experiencia en tiempo real sincronizada entre múltiples clientes conectados.
-
-
+Permite:
+Conexión de clientes
+Actualización dinámica de productos en la interfaz
 
 👤 Autor
 Emiliano Lafuente

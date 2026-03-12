@@ -10,13 +10,13 @@ socket.on('updateProducts', (products) => {
 
     li.innerHTML = `
       <strong>${product.title}</strong> - $${product.price}
-      <button data-id="${product.id}">Eliminar</button>
+      <button data-id="${product._id}">Eliminar</button>
     `
 
     list.appendChild(li)
   })
 
-  // Agregar evento a botones eliminar
+  // Evento eliminar
   document.querySelectorAll('button[data-id]').forEach(button => {
     button.addEventListener('click', () => {
       const id = button.getAttribute('data-id')
