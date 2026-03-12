@@ -112,7 +112,9 @@ http://localhost:8080
 ---
 
 📦 Endpoints disponibles
+
 📍 Productos (/api/products)
+
 🔹 GET /
 Obtiene productos con paginación, filtros y ordenamiento.
 
